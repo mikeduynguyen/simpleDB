@@ -1,3 +1,4 @@
+require './transaction'
 #-------- Database class --------#
 class Database
 	# Constants
@@ -130,7 +131,7 @@ class Database
 	# Display error when command is invalid
 	def invalid_command
 		# Invalid command message here
-		# puts 'Invalid command!'
+		puts 'Invalid command!'
 	end
 
 	private
@@ -155,53 +156,4 @@ class Database
 		puts OUTPUT_INDICATOR + @data.values.count(value).to_s
 	end
 
-end
-
-#-------- Database transaction class --------#
-class Transaction	
-	attr_reader :saved_data
-	attr_reader :new_data 
-
-	def initialize
-		# @saved_data: hash for storing current 
-		# version of data for each write 
-		# command
-		@saved_data = {}
-
-		# @new_data: hash for storing new data
-		# keys created in the transaction
-		@new_data = []
-	end
-
-	def save_data_state(name, value)
-		# Only save current state of
-		# data point, if data is already
-		# saved, do nothing.
-		if @saved_data[name].nil?
-			@saved_data[name] = value
-		end
-	end
-
-	def insert_new_key(name)
-		@new_data << name
-	end
-end
-
-#-------- Main --------#
-# Init an instance of the Database class
-@database = Database.new
-
-# Get commands from STDIN
-while input = $stdin.gets
-	puts input
-	# Use chomp to remove newline from the command
-	# and split it into Command, Name and Value by 
-	# the a space
-	args = input.chomp.split(' ')
-	# Check if input is nil or valid format
-	if args.size > 0
-		@database.execute(args)
-	else
-		@database.invalid_command
-	end
 end
