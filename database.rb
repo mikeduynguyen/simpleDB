@@ -41,7 +41,7 @@ class Database
 					if @data.key?(args[1])
 						# If existing data is being
 						# overwritten save its current state
-						@transaction_stack.last.save_data_state(name, @data[args[1]])
+						@transaction_stack.last.save_data_state(args[1], @data[args[1]])
 					else
 						# else keep a record that 
 						# it's a new data entry
@@ -70,7 +70,7 @@ class Database
 					if @data.key?(args[1])
 						# If existing data is being
 						# overwritten save its current state
-						save_state(args[1])						
+						@transaction_stack.last.save_data_state(args[1], @data[args[1]])					
 					end		
 				end	
 
@@ -104,17 +104,17 @@ class Database
 			end
 
 		when COMMAND_ROLLBACK
-			if @transaction_stack == 0
+			if @transaction_stack.size == 0
 				puts OUTPUT_INDICATOR + NO_TRANSACTION
 			else
 				# Rollback changes by writing saved data
 				# from the transaction to the db data
 				@transaction_stack.last.saved_data.each do |name, value|
-					self.set(name, value)
+					set(name, value)
 				end
 				# and delete newly created data
 				@transaction_stack.last.new_data.each do |name|
-					self.unset(name)
+					unset(name)
 				end
 				@transaction_stack.pop
 			end
@@ -177,8 +177,8 @@ class Transaction
 		# Only save current state of
 		# data point, if data is already
 		# saved, do nothing.
-		if @data[name].nil?
-			@data[name] = value
+		if @saved_data[name].nil?
+			@saved_data[name] = value
 		end
 	end
 
