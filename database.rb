@@ -11,11 +11,18 @@ class Database
 	NULL_VALUE = '> NULL'
 	## Output indicator
 	OUTPUT_INDICATOR = '> '
- 
-	# @data: hash for storing data
+	
 	def initialize
-		@data = {}
-		@transaction_stack = Transaction.new
+		# Init default transaction for the db, 
+		# which always lives at the bottom of the
+		# stack permanenly.
+		@default_transaction = Transaction.new
+
+		# Transaction stack (LIFO)
+		@transaction_stack = Stack.new
+		@transaction_stack.push(@default_transaction)
+
+		@data = @default_transaction.data
 		@current_transaction = nil
 	end
 
@@ -90,11 +97,11 @@ class Database
 end
 
 #-------- Database transaction class --------#
-class Transaction
-
-	def 
+class Transaction	
+	def initialize
+		# @data: hash for storing data
+		@data = {}
 	end
-
 end
 
 #-------- Simple stack implementation --------#
@@ -108,7 +115,11 @@ def Stack
 	end
 
 	def pop
-		@stack.pop
+		# Prevent the default transaction
+		# to be popped
+		unless @stack.size == 1
+			@stack.pop
+		end
 	end
 
 	def get_last_item
