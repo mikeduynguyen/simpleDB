@@ -150,7 +150,7 @@ class Database
 		@data[name] = nil
 	end
 
-	# Count number of occurences for a value
+	# Count number of occurrences for a value
 	def num_equal_to(value)
 		puts OUTPUT_INDICATOR + @data.values.count(value).to_s
 	end
