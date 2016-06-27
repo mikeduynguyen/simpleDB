@@ -21,6 +21,9 @@ class Database
 		# Hash to store data
 		@data = {}
 
+		# Hash to cache value count
+		@value_count = {}
+
 		# Transaction stack (LIFO)
 		@transaction_stack = []
 	end
@@ -135,7 +138,15 @@ class Database
 
 	private
 	def set(name, value)
+		# Decrement the count for value
+		# if existed variable is set
+		# to another value
+		if !@data[name].nil? && @data[name] != value
+			decrement_count(@data[name])
+		end
+
 		@data[name] = value
+		increment_count(value)
 	end
 
 	def get(name)
@@ -147,12 +158,39 @@ class Database
 	end
 
 	def unset(name)
+		decrement_count(@data[name])
 		@data[name] = nil
 	end
 
-	# Count number of occurrences for a value
+	# Print number of occurrences for a value
 	def num_equal_to(value)
-		puts OUTPUT_INDICATOR + @data.values.count(value).to_s
+		# If the value is not in the database
+		# print 0 as the count
+		result = 0
+		unless @value_count[value].nil?
+			result = @value_count[value]
+		end
+		puts OUTPUT_INDICATOR + result.to_s
+	end
+
+	def increment_count(value)
+		# Update value counter
+		# If count for value is nil, set
+		# it to 1 else increment it
+		if @value_count[value].nil?
+			@value_count[value] = 1
+		else
+			@value_count[value] += 1
+		end
+	end
+
+	def decrement_count(value)
+		# Update value counter
+		# If count for value is nil,
+		# skip else decrement it
+		if @value_count[value] && @value_count[value] > 0
+			@value_count[value] -= 1
+		end
 	end
 
 end
