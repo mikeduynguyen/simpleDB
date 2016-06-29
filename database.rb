@@ -42,7 +42,7 @@ class Database
 					unless (existing_data = @data[args[1]]).nil?
 						# If existing data is being
 						# overwritten save its current state
-						@transaction_stack.last.save_data_state(args[1], @data[args[1]])
+						@transaction_stack.last.save_data_state(args[1], existing_data)
 					else
 						# else keep a record that 
 						# it's a new data entry
