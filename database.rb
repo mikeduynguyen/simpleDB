@@ -20,10 +20,8 @@ class Database
 	def initialize
 		# Hash to store data
 		@data = {}
-
 		# Hash to cache value count
 		@value_count = {}
-
 		# Transaction stack (LIFO)
 		@transaction_stack = []
 	end
@@ -41,7 +39,7 @@ class Database
 			if args.size == 3
 				# Check if in a transaction block
 				if @transaction_stack.size > 0
-					if @data.key?(args[1])
+					unless (existing_data = @data[args[1]]).nil?
 						# If existing data is being
 						# overwritten save its current state
 						@transaction_stack.last.save_data_state(args[1], @data[args[1]])
@@ -75,8 +73,7 @@ class Database
 						# overwritten save its current state
 						@transaction_stack.last.save_data_state(args[1], @data[args[1]])					
 					end		
-				end	
-
+				end
 				unset(args[1])
 			else
 				invalid_command
@@ -111,7 +108,7 @@ class Database
 				puts OUTPUT_INDICATOR + NO_TRANSACTION
 			else
 				# Rollback changes by writing saved data
-				# from the transaction to the db data
+				# from the transaction to the db
 				@transaction_stack.last.saved_data.each do |name, value|
 					set(name, value)
 				end
@@ -196,13 +193,13 @@ class Database
 end
 
 #-------- Database transaction class --------#
-class Transaction	
+class Transaction
 	attr_reader :saved_data
-	attr_reader :new_data 
+	attr_reader :new_data
 
 	def initialize
-		# @saved_data: hash for storing current 
-		# version of data for each write 
+		# @saved_data: hash for storing current
+		# version of data for each write
 		# command
 		@saved_data = {}
 
